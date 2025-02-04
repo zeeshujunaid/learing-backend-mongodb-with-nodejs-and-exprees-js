@@ -1,4 +1,9 @@
 import express from 'express';
+import sendResponse from '../helpers/sendResponse.js';
+import  jwt from 'jsonwebtoken';
+import User from '../models/User.js';
+import 'dotenv/config';
+import { authenticateuser } from '../middelware/authentication.js';
 const router = express.Router();
 const users = [
     {
@@ -33,7 +38,7 @@ router.get('/', (req, res) => {
 router.post('/', (req, res) => {
     const { fullname, email } = req.body;
     console.log(fullname, email);
-    
+
 
     // Generate a new ID based on the last user's ID
     const newId = users.length > 0 ? users[users.length - 1].id + 1 : 1;
@@ -50,7 +55,7 @@ router.post('/', (req, res) => {
 
 router.get('/:id', (req, res) => {
     const user = users.find((data) => data.id == req.params.id);
-    if(!user){
+    if (!user) {
         res.status(404).json({
             error: true,
             message: "users not found",
@@ -64,4 +69,28 @@ router.get('/:id', (req, res) => {
     })
 });
 
-export  default router;
+router.put('/',authenticateuser, async (req, res) => {
+    try {
+        const {city,country} = req.body;
+    const user = await User.findOneAndUpdate(
+
+        { 
+            _id: req.user.id,
+         },
+        {
+            city,
+            country,
+        },{
+            new: true,
+        }
+
+    ).exec();
+        sendResponse(res, 200, false, "User updated successfully", user);
+    }
+    catch (err) {
+        console.log(err);
+        sendResponse(res, 401, true, "Something went wrong", null);
+    }});
+
+
+export default router;
