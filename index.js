@@ -2,6 +2,7 @@ import express from 'express';
 import morgan from 'morgan';
 import userRoutes from './routers/user.js';
 import taskRoutes from './routers/tasks.js';
+import authroutes from './routers/auth.js';
 import 'dotenv/config';
 import mongoose, { mongo } from 'mongoose';
 
@@ -49,6 +50,7 @@ app.use(middelware);
 app.use(express.json());
 app.use('/users', userRoutes);
 app.use('/tasks', taskRoutes);
+app.use('/auth', authroutes);
 app.use(morgan("tiny"));
 
 
